@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{%  load static %}
+
+<main class="container">       
+    <div class="row">
+        <div class="col-md-10 mt-2">
+            <form method="POST" class="card card-body" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% csrf_token %}
+                        {{ form.fecha_entrega.label_tag }}
+                        {{ form.fecha_entrega }}
+                        {{ form.fecha_radicado.label_tag }}
+                        {{ form.fecha_radicado }}
+                        <br>
+                        <div class="form-group">
+                            <label for="saludo" style="font-weight: bold;">Saludo:</label>
+                            <select id="saludo" name="saludo" class="form-control">
+                                <option value="Señor">Señor</option>
+                                <option value="Señora">Señora</option>
+                            </select>
+                        </div>
+                        {{ form.nombre.label_tag }}
+                        {{ form.nombre }}
+                        {{ form.radicado.label_tag }}
+                        {{ form.radicado }}
+                        {{ form.correo.label_tag }}
+                        {{ form.correo }}
+                        {{ form.direccion.label_tag }}
+                        {{ form.direccion }}
+                        {{ form.barrio.label_tag }}
+                        {{ form.barrio }}
+                        {{ form.localidad.label_tag }}
+                        {{ form.localidad }}
+                    </div>
+                    <div class="col-md-6">
+                        {% csrf_token %}
+                        {{ form.asunto.label_tag }}
+                        {{ form.asunto }}
+                        {{ form.peticion.label_tag }}
+                        {{ form.peticion }}
+                        <br>
+                        <label style="font-weight: bold;">Respuestas asuntos especificos...</label>
+                        <br>
+                        <textarea name="asunto1" rows="2" cols="65" placeholder='Asunto especifico 1...'></textarea>
+                        <br>
+                        <textarea name="asunto2" rows="2" cols="65" placeholder='Asunto especifico 2...'></textarea>
+                        <br>
+                        <textarea name="asunto3" rows="2" cols="65" placeholder='Asunto especifico 3...'></textarea>
+                        <hr>
+                        {%  for alerta in alertas %}
+                        {{alerta}}
+                        <br>
+                        {% endfor %}
+                        <br>
+                        <button class="btn btn-primary" class="centered" >
+                            Generar formato de RTA
+                        </button>
+                        <a href="{{url}}" target="_blank">{{doc_name}}</a>
+                    </div>
+                </div>  
+            </form> 
+        </div>  
+        <div class="col-md-2 mt-2">
+            <img src="{% static "imagenes/flecha3.png" %}" alt="flecha" style="width: 200px; height: auto;">
+            <img src="{% static "imagenes/documento.png" %}" alt="documento" style="width: 200px; height: auto;">
+        </div>
+    </div>
+</main>
+
+{% endblock %}

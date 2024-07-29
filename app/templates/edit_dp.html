@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{%  load static %}
+
+<main class="container">
+     <div class="row">
+        <!-- <br> 
+        <h3>Editar registro: {{nombre_encabezado}}</h3> -->
+        <div class="col-md-12 mt-1">
+            <form method="POST" class="card card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% csrf_token %}
+                        {{ form.fecha_llegada.label_tag }}
+                        {{ form.fecha_llegada }}
+                        {{ form.fecha_radicado.label_tag }}
+                        {{ form.fecha_radicado }}
+                        {{ form.fecha_entrega.label_tag }}
+                        {{ form.fecha_entrega }}
+                        <br>   
+                        {{ form.nombre.label_tag }}
+                        {{ form.nombre }}
+                        {{ form.radicado.label_tag }}
+                        {{ form.radicado }}
+                        {{ form.correo.label_tag }}
+                        {{ form.correo }}
+                        {{ form.direccion.label_tag }}
+                        {{ form.direccion }}
+                        {{ form.latitud.label_tag }}
+                        {{ form.latitud }}
+                        {{ form.longitud.label_tag }}
+                        {{ form.longitud }}
+                        {{ form.ciudad.label_tag }}
+                        {{ form.ciudad }}
+                        
+                    </div>
+                    <div class="col-md-6">
+                        {% csrf_token %}
+                        {{ form.localidad.label_tag }}
+                        {{ form.localidad }}
+                        {{ form.barrio.label_tag }}
+                        {{ form.barrio }}
+                        {{ form.tipo_dp.label_tag }}
+                        {{ form.tipo_dp }}
+                        {{ form.tema_dp.label_tag }}
+                        {{ form.tema_dp }}
+                        {{ form.asunto.label_tag }}
+                        {{ form.asunto }}
+                        {{ form.peticion.label_tag }}
+                        {{ form.peticion }}
+                        {{ form.enviada_revision.label_tag }}
+                        {{ form.enviada_revision }}
+                        {{ form.enviada_aerocivil.label_tag }}
+                        {{ form.enviada_aerocivil }}
+                        {{ form.enviada.label_tag }}
+                        {{ form.enviada }}
+                        <br>
+                        {{ form.radicado_salida.label_tag }}
+                        {{ form.radicado_salida }}
+                        {{ form.fecha_salida.label_tag }}
+                        {{ form.fecha_salida }}
+                        <button class="btn btn-primary" class="centered">
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>|
+
+{% endblock %}

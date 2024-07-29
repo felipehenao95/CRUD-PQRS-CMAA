@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{%  load static %}
+
+<main class="container">
+        <div class="row">
+            <br>
+            <hr>
+            <h3> - {{nombre_encabezado}}:</h3>
+            <section class="col-md-6 mt-2">
+                <form method="POST" class="card card-body" enctype="multipart/form-data">
+                    <h2 class="text-center"> Documentos </h2>
+                    {%  csrf_token %}
+                    {%  for alerta in alertas %}
+                    {{alerta}}
+                    <br>
+                    {% endfor %}
+                    <hr><br>
+                    <input type="file" multiple name="files" id="name" required/>
+                    <br>
+                    <button class="btn btn-primary">
+                        Guardar DOCS
+                    </button>
+                </form>
+                <div>
+                    {% for url, name in urls_and_names %}
+                    <hr>
+                    <a href="{{url}}" target="_blank">{{name}}</a>
+                    <a href="/delete_document/{{peticionario_id}}/{{name}}" class='btn btn-sm btn-danger'><i class='fa-solid fa-trash'></i></a>
+                    {% endfor %}
+                </div>
+            </section>
+            <section class="col-md-6 mt-2">
+                <form method="POST" class="card card-body" enctype="multipart/form-data">
+                    <h2 class="text-center"> Respuesta Firmada </h2>
+                    {%  csrf_token %}
+                    {%  for alertarta in alertasrtas %}
+                    {{alertarta}}
+                    <br>
+                    {% endfor %}
+                    <hr><br>
+                    <input type="file" name="rta" id="name" required/>
+                    <br>
+                    {{ form.radicado_salida.label_tag }}
+                    {{ form.radicado_salida }}
+                    <br>
+                    {{ form.fecha_salida.label_tag }}
+                    {{ form.fecha_salida }}
+                    <br>
+                    {{ form.enviada.label_tag }}
+                    {{ form.enviada }}
+                    <br>
+                    <button class="btn btn-primary">
+                        Actualizar y Guardar RTA
+                    </button>
+                </form>
+                <div>
+                    {% for url2, name2 in urls_and_names_rta %}
+                    <hr>
+                    <a href="{{url2}}" target="_blank">{{name2}}</a>
+                    <a href="/delete_rta/{{peticionario_id}}/{{name2}}" class='btn btn-sm btn-danger' onclick="return confirm('¿Estás seguro de que quieres borrar este elemento?');"><i class='fa-solid fa-trash'></i></a>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+</main>
+
+{% endblock %}

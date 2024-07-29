@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{%  load static %}
+
+<main class="container">
+    <div class="row">
+        <section class="col-md-9 offset-md-2 mt-5">
+            <form method="POST" class="card card-body" enctype="multipart/form-data">
+                <h1 class="text-center"> Subir archivo consolidado PQRS </h1>
+                <h3> El archivo adjunto debe cumplir con los siguientes requermientos: </h3>
+                <h5> 1. El archivo de ser formato .xlsx (Excel) </h5>
+                <h5> 2. El archivo debe tener las siguientes columnas: 'fecha_llegada', 'fecha_entrega', 'fecha_radicado', 'nombre', 'radicado', 'correo', 'direccion', 'latitud', 'longitud', 'ciudad', 'localidad', 'barrio', 'tipo_dp', 'tema_dp', 'asunto', 'peticion', 'enviada', 'radicado_salida', 'fecha_salida' </h5>
+                <h5> 3. Los datos de las columnas 'fecha_llegada' y 'nombre' no pueden estar nulos </h5>
+                {%  csrf_token %}
+                {{alertas}}
+                <hr><br><br>
+                <input type="file" name="file" id="name" required />
+                <br><br>
+                <button class="btn btn-primary">
+                    Cargar datos!
+                </button>
+            </form>
+        </section>
+    </div>
+</main>
+
+{% endblock %}

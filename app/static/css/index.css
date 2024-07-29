@@ -1,0 +1,98 @@
+.center {
+    text-align: center !important;
+    vertical-align: middle !important;
+    
+}
+
+.centered {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.form-date-input-center {
+    margin: 0 auto; /* Para centrar horizontalmente */
+}
+
+/* Estilo para ajustar el ancho de los campos de fecha */
+.form-date-input-width {
+    width: 400px;
+    padding: 5px;
+    text-align: center !important;
+    margin-left: 30px; 
+    margin-top: 5px;
+    margin-bottom: 5px;/* Ajusta este valor según tus necesidades */
+}
+
+.navbar-custom {
+    background-color: #000000; /* Negro puro */
+}
+
+.form-date-input {
+    margin-bottom: 5px; /* Ajusta este valor según tus necesidades */
+}
+.form-label-bold {
+    font-weight: bold;
+}
+.form-label-padding {
+    padding: 5px;
+}
+
+#datatable-peticionarios td {
+    max-width: 1px;  /* Establece el ancho máximo de las celdas */
+    white-space: nowrap; /* Evita que el texto se ajuste */
+    overflow: hidden; /* Oculta el texto que desborda */
+    text-overflow: ellipsis; /* Muestra puntos suspensivos (...) para indicar que el texto se ha truncado */
+}
+
+#datatable-peticionarios th, 
+#datatable-peticionarios td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#datatable-peticionarios th:nth-child(1),  /* # */
+#datatable-peticionarios td:nth-child(1) {
+    width: 50px !important;
+}
+#datatable-peticionarios th:nth-child(2),  /* Nombre */
+#datatable-peticionarios td:nth-child(2) {
+    width: 250px !important;
+}
+#datatable-peticionarios th:nth-child(3),  /* Fecha Llegada */
+#datatable-peticionarios td:nth-child(3) {
+    width: 100px !important;
+}
+#datatable-peticionarios th:nth-child(4),  /* fecha entrega */
+#datatable-peticionarios td:nth-child(4) {
+    width: 100px !important;
+}
+#datatable-peticionarios th:nth-child(5),  /* Radicado*/
+#datatable-peticionarios td:nth-child(5) {
+    width: 250px !important;
+}
+#datatable-peticionarios th:nth-child(6),  /* localidad */
+#datatable-peticionarios td:nth-child(6) {
+    width: 50px !important;
+}
+#datatable-peticionarios th:nth-child(7),  /* Barrio */
+#datatable-peticionarios td:nth-child(7) {
+    width: 50px !important;
+}
+#datatable-peticionarios th:nth-child(8),  /* Tema */
+#datatable-peticionarios td:nth-child(8) {
+    width: 100px !important;
+}
+#datatable-peticionarios th:nth-child(9),  /* Enviada */
+#datatable-peticionarios td:nth-child(9) {
+    width: 50px !important;
+}
+#datatable-peticionarios th:nth-child(10),  /* opciones */
+#datatable-peticionarios td:nth-child(10) {
+    width: 200px !important;
+}
+
+.container {
+    max-width: 1400px; /* Cambia el ancho máximo según tu diseño */
+}
+
+

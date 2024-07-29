@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{%  load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Gráfico de Líneas con ECharts y Django</title>
+        <!-- Incluir tu archivo JavaScript separado -->
+        <link rel="stylesheet" href="{%  static 'css/index.css' %}"/>
+        <style>
+            /* Añade estilos personalizados para ajustar el tamaño de las gráficas */
+            .chart-container {
+                width: 100%;
+                height: 350px; /* Ajusta la altura según sea necesario */
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <h2 class="centered"> GRÁFICOS PQRS </h2> -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                    <div id="chart1" class="chart-container"></div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                    <div id="chart2" class="chart-container"></div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mt-5">
+                    <div id="chart3" class="chart-container"></div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mt-5">
+                    <div id="chart4" class="chart-container"></div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mt-5">
+                    <div id="chart5" class="chart-container"></div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mt-5">
+                    <div id="chart6" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Incluir la librería de ECharts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+        <script>
+            var data_json1 = JSON.parse('{{ data_json1|escapejs }}');
+            var data_json2 = JSON.parse('{{ data_json2|escapejs }}');
+            var data_json3 = JSON.parse('{{ data_json3|escapejs }}');
+            var data_json4 = JSON.parse('{{ data_json4|escapejs }}');
+            var data_json5 = JSON.parse('{{ data_json5|escapejs }}');
+            var data_json6 = JSON.parse('{{ data_json6|escapejs }}');
+        </script>
+        <script src="{% static 'js/graficos.js' %}"></script>
+    </body>
+</html>
+
+
+{% endblock %}

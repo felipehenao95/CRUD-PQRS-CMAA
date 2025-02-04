@@ -59,8 +59,10 @@ const listProgrammers=async() =>{
                             : !peticionario.enviada && peticionario.enviada_aerocivil
                                 ? "<i class='fa-solid fa-check' style='color: green;'></i>"
                                 : peticionario.enviada_revision && !peticionario.enviada && !peticionario.enviada_aerocivil
-                                    ? "<i class='fa-solid fa-search' style='color: purple;'></i>"
-                                    : "<i class='fa-solid fa-clock' style='color: orange;'></i>"
+                                    ? "<i class='fa-solid fa-search' style='color: purple;'></i>&nbsp;<i class='fa-solid fa-user-tie' style='color: purple;'></i>"
+                                    : peticionario.enviada_preliminar && !peticionario.enviada_revision && !peticionario.enviada && !peticionario.enviada_aerocivil
+                                        ? "<i class='fa-solid fa-user-clock' style='color: orange;'></i>"
+                                        : "<i class='fa-solid fa-clock' style='color: black;'></i>"
                         }
                     </td>
                     <td>

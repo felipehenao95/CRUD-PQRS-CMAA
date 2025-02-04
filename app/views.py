@@ -10,6 +10,7 @@ from django.conf import settings
 import os
 import folium
 from folium.plugins import FastMarkerCluster
+from folium.plugins import MarkerCluster
 import pandas as pd
 import shutil
 from datetime import datetime as dt
@@ -18,6 +19,9 @@ from docxtpl import DocxTemplate
 from io import BytesIO
 import base64
 from datetime import datetime
+import simplekml
+import zipfile
+from django.db import transaction
 
 
 # Create your views here.
@@ -414,19 +418,52 @@ def proyecciones(request, programmer_id):
         }
         plantilla_path = os.path.join(settings.MEDIA_ROOT, 'plantillas\\PlantillaPQRS.docx')
         doc = DocxTemplate(plantilla_path)
+        nombre_busqueda = f"{str(user.nombre).replace(' ', '_')} {user.fecha_llegada.strftime('%Y-%m-%d')}"
 
         doc.render(datos_usuario)
-
         output = BytesIO()
-        nombre_archivo = f'RTA {nombre}.docx' 
+        nombre_archivo = f'RTA_{nombre_busqueda}.docx' 
         doc.save(output)
         output.seek(0)
-        nombre_completo_archivo = os.path.join(settings.MEDIA_ROOT, 'plantillas', nombre_archivo)
-        encoded_file2= base64.b64encode(output.read()).decode()
-        with open(nombre_completo_archivo, 'wb') as f:
-            f.write(base64.b64decode(encoded_file2))
-        alertas.append(f'- Generación de formato exitosa!')
-        url_archivo =  os.path.join(settings.MEDIA_URL, 'plantillas', nombre_archivo)
+
+        
+        carpeta_peticionario = os.path.join(settings.MEDIA_ROOT, 'documents', nombre_busqueda)
+
+        if not os.path.exists(carpeta_peticionario):
+            os.makedirs(carpeta_peticionario)
+
+        ruta_archivo = os.path.join(carpeta_peticionario, nombre_archivo)
+        # archivo_existente = Documents.objects.filter(archivo=f'documents/{nombre_busqueda}/{nombre_archivo}', peticionario=user.id).exists()
+
+        try:
+            with transaction.atomic():
+                # Verificar si el registro ya existe en la base de datos
+                documento_existente = Documents.objects.filter(
+                    archivo=f'documents/{nombre_busqueda}/{nombre_archivo}', 
+                    peticionario=user.id
+                ).first()
+
+                if documento_existente:
+                    # Actualizar registro existente
+                    documento_existente.archivo = f'documents/{nombre_busqueda}/{nombre_archivo}'
+                    documento_existente.save()
+                    alertas.append(f'- El archivo {nombre_archivo} ya existía y se actualizó en la base de datos.')
+                else:
+                    # Crear nuevo registro
+                    nuevo_documento = Documents(
+                        archivo=f'documents/{nombre_busqueda}/{nombre_archivo}',
+                        peticionario=user
+                    )
+                    nuevo_documento.save()
+                    alertas.append(f'- El archivo {nombre_archivo} se ha registrado correctamente en la base de datos.')
+
+                # Guardar el archivo en el sistema de archivos
+                with open(ruta_archivo, 'wb') as f:
+                    f.write(output.read())
+                    alertas.append(f'- El archivo {nombre_archivo} se ha guardado exitosamente en {carpeta_peticionario}.')
+
+        except Exception as e:
+            alertas.append(f'- Ocurrió un error al guardar el archivo: {str(e)}')
     
         data['asunto'] = asunto
         data['peticion'] = peticion
@@ -436,7 +473,8 @@ def proyecciones(request, programmer_id):
             alertas.append(f'- Se actualizaron los capos de Asunto y Petición para este registro...')
         else:
             alertas.append(f'- El formulario no es valido')
-
+        
+        url_archivo = os.path.join(settings.MEDIA_URL, f'documents/{nombre_busqueda}/', nombre_archivo)
         return render(request, 'proyecciones.html',{
             'form': form,
             'url': url_archivo,
@@ -444,34 +482,57 @@ def proyecciones(request, programmer_id):
             'alertas': alertas
         })
 
+def read_coordinates_from_txt(txt_path):
+    with open(txt_path, 'r') as file:
+        # Leer el contenido del archivo
+        content = file.read().strip()
+    
+    # Dividir el contenido en coordenadas individuales
+    coord_strings = content.split(' ')
+    
+    # Convertir las coordenadas a formato numérico y guardarlas en una lista
+    coordinates = []
+    for coord in coord_strings:
+        lon, lat, _ = coord.split(',')
+        coordinates.append([float(lat), float(lon)])
+    
+    return coordinates
+
 @login_required
 def mapa(request):
+    
     peticionarios = Peticionarios.objects.exclude(longitud='', latitud='')
 
-    initialMap = folium.Map(location=[4.669336, -74.089791], zoom_start=12)
+    initialMap = folium.Map(location=[4.669399, -74.089791], zoom_start=12)
+    
+    marker_cluster = MarkerCluster().add_to(initialMap)
 
-    lats= [peticionario.latitud for peticionario in peticionarios]
-    longs= [peticionario.longitud for peticionario in peticionarios]
+    for peticionario in peticionarios:
+        if peticionario.latitud and peticionario.longitud:
+            # Crear el contenido del popup
+            popup_content = f"""
+                <strong>Nombre:</strong> {peticionario.nombre}<br>
+                <strong>Fecha de Llegada:</strong> {peticionario.fecha_llegada}<br>
+                <strong>Petición:</strong> {peticionario.peticion}
+            """
+            
+            folium.Marker(
+                location=[float(peticionario.latitud), float(peticionario.longitud)],
+                popup=folium.Popup(popup_content, max_width=250)
+            ).add_to(marker_cluster)
 
-    FastMarkerCluster(data=list(zip(lats,longs))).add_to(initialMap)
-
-    barrio_la_felicidad_coords = [
-        [4.671, -74.093],
-        [4.670, -74.090],
-        [4.668, -74.089],
-        [4.667, -74.091],
-        [4.669, -74.094],
-        [4.671, -74.093]
-    ]
+    AI_txt_path = os.path.join(settings.BASE_DIR, 'app', 'coordenadas.txt')
+    coordinates = read_coordinates_from_txt(AI_txt_path)
+    
     folium.Polygon(
-        locations=barrio_la_felicidad_coords,
+        locations=coordinates,
         color='blue',
         weight=2,
         fill=True,
         fill_color='blue',
         fill_opacity=0.1
     ).add_to(initialMap)
-
+    
     context={'map':initialMap._repr_html_()}
     return render(request, 'map.html', context)
 
@@ -497,27 +558,67 @@ def export_dps(request):
         'Tema DP': [p.tema_dp for p in queryset],
         'Asunto': [p.asunto for p in queryset],
         'Petición': [p.peticion for p in queryset],
-        'Enviada': [p.enviada for p in queryset],
-        'Enviada Aerocivil': [p.enviada_aerocivil for p in queryset],
         'Radicado Salida': [p.radicado_salida for p in queryset],
         'Fecha Salida': [p.fecha_salida for p in queryset],
+        'Ruta Respuesta Final': [RtasFinales.objects.filter(peticionario=p).first().rta.path if RtasFinales.objects.filter(peticionario=p).exists() else '' for p in queryset],
+        'Nombre Respuesta Final': [RtasFinales.objects.filter(peticionario=p).first().rta.name if RtasFinales.objects.filter(peticionario=p).exists() else '' for p in queryset],
+        'Carpeta Documentos': [os.path.dirname(Documents.objects.filter(peticionario=p).first().archivo.path) if Documents.objects.filter(peticionario=p).exists() else '' for p in queryset],
     }
     df = pd.DataFrame(data)
 
     # Especificar el orden de las columnas
-    column_order = ['Nombre', 'Fecha Llegada', 'Fecha Entrega', 'Fecha Radicado', 'Radicado', 'Correo', 'Dirección', 'Longitud','Latitud','Ciudad', 'Localidad', 'Barrio', 'Tipo DP', 'Tema DP', 'Asunto', 'Petición', 'Enviada', 'Enviada Aerocivil', 'Radicado Salida', 'Fecha Salida']
+    column_order = ['Nombre', 'Fecha Llegada', 'Fecha Entrega', 'Fecha Radicado', 'Radicado', 'Correo', 'Dirección', 'Longitud','Latitud','Ciudad', 'Localidad', 'Barrio', 'Tipo DP', 'Tema DP', 'Asunto', 'Petición', 'Radicado Salida', 'Fecha Salida', 'Ruta Respuesta Final', 'Nombre Respuesta Final', 'Carpeta Documentos']
     df = df[column_order]
 
-    # Crear una respuesta HTTP con el archivo Excel
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=peticionarios.xlsx'
+    excel_file_path = "peticionarios.xlsx"
+    df.to_excel(excel_file_path, index=False)
 
-    # Guardar el DataFrame en un archivo Excel y enviar la respuesta
-    df.to_excel(response, index=False)
+    kml = simplekml.Kml()
+
+    # Añadir puntos para cada peticionario en el KML
+    for peticionario in queryset:
+        if peticionario.latitud and peticionario.longitud:
+            kml.newpoint(name=peticionario.nombre, coords=[(peticionario.longitud, peticionario.latitud)])
+
+    # Guardar el archivo KML
+    kml_file_path = "peticionarios.kml"
+    kml.save(kml_file_path)
+
+    # Comprimir el archivo KML para generar un KMZ
+    kmz_file_path = "peticionarios.kmz"
+    with zipfile.ZipFile(kmz_file_path, 'w', zipfile.ZIP_DEFLATED) as kmz:
+        kmz.write(kml_file_path)
+
+    # Crear un archivo ZIP que contenga tanto el Excel como el KMZ
+    zip_file_path = "peticionarios.zip"
+    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+        zipf.write(excel_file_path)
+        zipf.write(kmz_file_path)
+
+    # Crear la respuesta HTTP para descargar el ZIP
+    with open(zip_file_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename=peticionarios.zip'
+
+    # Limpiar archivos temporales
+    os.remove(excel_file_path)
+    os.remove(kml_file_path)
+    os.remove(kmz_file_path)
+    os.remove(zip_file_path)
+    
     return response
 
 @login_required
 def graficos(request):
+    if request.method == 'POST':
+        start_date = request.POST.get('start-date', '2024-01')
+        end_date = request.POST.get('end-date', datetime.today().strftime('%Y-%m'))
+        
+    else:
+        start_date = '2024-01'
+        end_date = datetime.today().strftime('%Y-%m')
+        
+
     queryset = Peticionarios.objects.all()
     data = {
         'Nombre': [p.nombre for p in queryset],
@@ -533,9 +634,9 @@ def graficos(request):
     df_peticiones['Barrio'] = df_peticiones['Barrio'].replace('','Sin ubicación')
     df_peticiones['Fecha Llegada'] = pd.to_datetime(df_peticiones['Fecha Llegada'])
 
-    start_date = '2024-01-01'
-    end_date = datetime.today().strftime('%Y-%m-%d')
+    
     date_range = pd.date_range(start_date, end_date, freq='D')
+
     peticiones_por_dia = df_peticiones['Fecha Llegada'].value_counts().sort_index()
     df_counts1 = peticiones_por_dia.reindex(date_range, fill_value=0).reset_index()
     df_counts1.columns = ['fecha', 'cantidad']
@@ -543,6 +644,7 @@ def graficos(request):
 
     # Segundo gráfico: Cantidad de peticiones por mes
     df_peticiones['Mes'] = df_peticiones['Fecha Llegada'].dt.to_period('M')
+    df_peticiones = df_peticiones[(df_peticiones['Mes'] >= start_date) & (df_peticiones['Mes'] <= end_date)]
     peticiones_por_mes = df_peticiones['Mes'].value_counts().sort_index()
     df_counts2 = peticiones_por_mes.reset_index()
     df_counts2.columns = ['mes', 'cantidad']
@@ -569,4 +671,13 @@ def graficos(request):
     barrio_counts.columns = ['barrio', 'cantidad']
     data_json6 = barrio_counts.to_json(orient='records')
 
-    return render(request, 'graficos.html', {'data_json1': data_json1, 'data_json2': data_json2, 'data_json3': data_json3, 'data_json4': data_json4, 'data_json5': data_json5, 'data_json6': data_json6})
+    return render(request, 'graficos.html', {
+        'data_json1': data_json1, 
+        'data_json2': data_json2, 
+        'data_json3': data_json3, 
+        'data_json4': data_json4, 
+        'data_json5': data_json5, 
+        'data_json6': data_json6,
+        'start_date': start_date,
+        'end_date': end_date,
+        })

@@ -34,6 +34,14 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             axisPointer: { animation: false }
         },
+        toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {}
+            },
+            left: 'left',    // Posiciona el toolbox a la izquierda
+            bottom: '0%',
+        },
         dataZoom: {show:true},
         xAxis: { type: 'time', boundaryGap: false },
         yAxis: { type: 'value', boundaryGap: [0, '100%'] },
@@ -76,6 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return formattedDate + ' : ' + params[0].value;
             }
         },
+        toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {}
+            },
+            left: 'left',    // Posiciona el toolbox a la izquierda
+            bottom: '0%',
+        },
         xAxis: { type: 'category', data: categories2,
             axisTick: {
                 show: false
@@ -91,6 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'bar',
             showBackground: true,
             data: seriesData2,
+            label: {
+                show: true,  // Muestra el label de cada sección
+            },
             itemStyle: {
                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                   { offset: 0, color: '#83bff6' },
@@ -122,6 +141,14 @@ document.addEventListener('DOMContentLoaded', function() {
             trigger: 'item',
             formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
+        toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {}
+            },
+            left: 'left',    // Posiciona el toolbox a la izquierda
+            bottom: '0%',
+        },
         legend: {
             orient: 'vertical',
             left: 'right'
@@ -132,6 +159,10 @@ document.addEventListener('DOMContentLoaded', function() {
             radius: '55%',
             center: ['50%', '50%'],
             data: seriesData3,
+            label: {
+                show: true,  // Muestra el label de cada sección
+                formatter: '{b}: {d}%'  // Formato del label: nombre y porcentaje
+            },
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,
@@ -153,6 +184,15 @@ document.addEventListener('DOMContentLoaded', function() {
         title: { text: 'AGRUPACIÓN POR TIPO',
             subtext: 'Distribución de PQRS por Tipo'
          },
+        toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {}
+            },
+            left: 'left',    // Posiciona el toolbox a la izquierda
+            bottom: '0%',
+        },
+        dataZoom: {show:true},
         tooltip: {
             trigger: 'item',
             formatter: '{a} <br/>{b} : {c} ({d}%)'
@@ -167,6 +207,10 @@ document.addEventListener('DOMContentLoaded', function() {
             radius: '55%',
             center: ['50%', '50%'],
             data: seriesData4,
+            label: {
+                show: true,  // Muestra el label de cada sección
+                formatter: '{b}: {d}%'  // Formato del label: nombre y porcentaje
+            },
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,
@@ -192,16 +236,31 @@ document.addEventListener('DOMContentLoaded', function() {
             trigger: 'item',
             formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
+        toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {}
+            },
+            left: 'left',    // Posiciona el toolbox a la izquierda
+            bottom: '0%',
+        },
         legend: {
             orient: 'vertical',
-            left: 'right'
-          },
+            type: 'scroll',
+            right: 10,
+            top: 10,
+            bottom: 10,
+        },
         series: [{
             name: 'Tema DP',
             type: 'pie',
             radius: '55%',
             center: ['50%', '50%'],
             data: seriesData5,
+            label: {
+                show: true,  // Muestra el label de cada sección
+                formatter: '{d}%'  // Formato del label: nombre y porcentaje
+            },
             emphasis: {
                 itemStyle: {
                     shadowBlur: 10,
@@ -218,6 +277,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return { name: item.barrio, value: item.cantidad };
     });
 
+    // Ordena los datos por valor descendente
+    seriesData6.sort(function(a, b) {
+        return b.value - a.value;
+    });
+
     var chart6 = echarts.init(document.getElementById('chart6'));
     var option6 = {
         title: { text: 'AGRUPACIÓN POR BARRIO',
@@ -226,6 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tooltip: {
             trigger: 'item',
             formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {}
+            },
+            left: 'left',    // Posiciona el toolbox a la izquierda
+            bottom: '0%',
         },
         legend: {
             orient: 'vertical',
@@ -240,7 +312,15 @@ document.addEventListener('DOMContentLoaded', function() {
             radius: '55%',
             center: ['50%', '50%'],
             data: seriesData6,
-            label: {show: false},
+            //label: {show: false},
+            label: {
+                show: true,
+                formatter: function(params) {
+                    // Solo muestra etiquetas para los primeros 4 valores más altos
+                    var index = seriesData6.findIndex(item => item.name === params.name);
+                    return index < 8 ? `${params.percent.toFixed(2)}%` : '';
+                }
+            },
             emphasis: {
                 itemStyle: {
                     borderRadius: 5,

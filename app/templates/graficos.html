@@ -11,6 +11,8 @@
         <title>Gráfico de Líneas con ECharts y Django</title>
         <!-- Incluir tu archivo JavaScript separado -->
         <link rel="stylesheet" href="{%  static 'css/index.css' %}"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    
         <style>
             /* Añade estilos personalizados para ajustar el tamaño de las gráficas */
             .chart-container {
@@ -20,9 +22,26 @@
         </style>
     </head>
     <body>
-        <!-- <h2 class="centered"> GRÁFICOS PQRS </h2> -->
         <div class="container mt-4">
-            <div class="row">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="start-date">Fecha de inicio:</label>
+                        <input type="text" class="form-control datepicker-month" id="start-date" name="start-date" value="{{ default_start_date }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end-date">Fecha de fin:</label>
+                        <input type="text" class="form-control datepicker-month" id="end-date" name="end-date" value="{{ default_end_date }}">
+                    </div>
+                    <div class="col-md-4 align-self-end">
+                        <button type="submit" style="width: 350px; height: 40px;" class="btn btn-primary">Actualizar gráficos</button>
+                    </div>
+                </div>
+            </form>
+        <!-- <h2 class="centered"> GRÁFICOS PQRS </h2> -->
+        <!-- <div class="container mt-4"> -->
+            <div class="row mt-5">
                 <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
                     <div id="chart1" class="chart-container"></div>
                 </div>
@@ -45,6 +64,22 @@
         </div>
         <!-- Incluir la librería de ECharts -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                $('.datepicker-month').datepicker({
+                    format: "yyyy-mm", // Formato de año y mes
+                    startView: "months", 
+                    minViewMode: "months", // Modo de vista solo de meses
+                    autoclose: true
+                });
+                $('#start-date').val('{{ start_date }}');
+                $('#end-date').val('{{ end_date }}');
+            });
+            
+        </script>
         <script>
             var data_json1 = JSON.parse('{{ data_json1|escapejs }}');
             var data_json2 = JSON.parse('{{ data_json2|escapejs }}');
@@ -52,7 +87,7 @@
             var data_json4 = JSON.parse('{{ data_json4|escapejs }}');
             var data_json5 = JSON.parse('{{ data_json5|escapejs }}');
             var data_json6 = JSON.parse('{{ data_json6|escapejs }}');
-        </script>
+        </script>   
         <script src="{% static 'js/graficos.js' %}"></script>
     </body>
 </html>

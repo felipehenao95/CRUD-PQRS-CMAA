@@ -19,7 +19,9 @@ class Peticionarios(models.Model):
         ('Funza', 'Funza'),
         ('Suba', 'Suba'),
         ('Kennedy', 'Kennedy'),
+        ('Los Mártires', 'Los Mártires'),
         ('Bosa', 'Bosa'),
+        ('SantaFe', 'SantaFe'),
         ('Ciudad Bolivar', 'Ciudad Bolivar'),
         ('Soacha', 'Soacha'),
     )
@@ -59,6 +61,7 @@ class Peticionarios(models.Model):
     enviada  = models.BooleanField(default=False)
     enviada_aerocivil  = models.BooleanField(default=False)
     enviada_revision  = models.BooleanField(default=False)
+    enviada_preliminar  = models.BooleanField(default=False)
     radicado_salida=models.CharField(max_length =500, blank=True)
     fecha_salida = models.DateField(null=True, blank=True)
     

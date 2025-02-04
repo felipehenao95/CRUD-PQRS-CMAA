@@ -25,7 +25,7 @@ class PeticionarioForm(forms.ModelForm):
 
     class Meta:
         model= Peticionarios
-        fields = ['fecha_llegada','fecha_radicado', 'fecha_entrega','nombre', 'radicado', 'correo','direccion','latitud','longitud','ciudad','localidad','barrio','tipo_dp','tema_dp','asunto','peticion','enviada', 'enviada_aerocivil','enviada_revision','radicado_salida','fecha_salida']
+        fields = ['fecha_llegada','fecha_radicado', 'fecha_entrega','nombre', 'radicado', 'correo','direccion','latitud','longitud','ciudad','localidad','barrio','tipo_dp','tema_dp','asunto','peticion','enviada', 'enviada_aerocivil','enviada_revision','enviada_preliminar','radicado_salida','fecha_salida']
         widgets = {
             'fecha_llegada': forms.DateInput(format=('%Y-%m-%d'),   
                                         attrs={'type':'date', 'class':'form-date-input-center form-date-input-width', 
@@ -70,6 +70,8 @@ class PeticionarioForm(forms.ModelForm):
             'enviada_aerocivil': forms.CheckboxInput(attrs={'class': 'form-label-padding'}),
 
             'enviada_revision': forms.CheckboxInput(attrs={'class': 'form-label-padding'}),
+
+            'enviada_preliminar': forms.CheckboxInput(attrs={'class': 'form-label-padding'}),
 
             'radicado_salida': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Radicado de salida...'}),
 
